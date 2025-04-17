@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+      "target": "ES2020",                         // Set the JavaScript version
+      "module": "ESNext",                       // Module system (can also be "ESNext" or "ES6")
+      "rootDir": "./src",                         // Where your source TS files are
+      "outDir": "./dist",                         // Where compiled JS files go
+      "strict": true,                             // Enable all strict type-checking options
+      "esModuleInterop": true,                    // Enables default imports from modules with no default export
+      "forceConsistentCasingInFileNames": true,   // Ensure consistent casing in imports
+      "skipLibCheck": true,                       // Skip type checking of declaration files for faster builds
+      "moduleResolution": "node",                 // How modules are resolved
+      "resolveJsonModule": true,                  // Allows importing JSON files
+      "isolatedModules": true,                    // Required for tools like Babel or SWC
+      "noEmit": false                             // Set to true if you only want type-checking
+    },
+    "include": ["src/**/*"],
+    "exclude": ["node_modules", "dist"]
+  }
+  
