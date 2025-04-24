@@ -1,19 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
 
 @Injectable()
 export class StorageService {
 
-    constructor() { }
+    constructor() {}
 
-    uploadFile(file: any) {
+    uploadFile(file: any): string {
         const acceptedFileTypes = ['image/jpeg', 'image/png', 'image/heif', 'application/pdf', 'application/xml'];
 
         if (!acceptedFileTypes.includes(file.mimetype)) {
-            throw new Error('Invalid file type');
+            throw new BadRequestException('Invalid file type');
         }
-        return { message: 'File uploaded successfully', filePath: file.path };
+        return file.path;
     }
 
     storeFile(file: string): void {

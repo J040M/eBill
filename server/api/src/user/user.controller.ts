@@ -1,7 +1,9 @@
-import { Controller, Body, Get, Post, Put, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Body, Get, Post, Put, Param, Query, UseGuards, Provider } from '@nestjs/common';
+import { SignInWithOAuthCredentials, SignInWithPasswordCredentials, User } from '@supabase/supabase-js';
+import { BadRequestException, NotFoundException } from '@nestjs/common/exceptions';
 import { UserService } from './user.service';
-import { SupaAuthGuard } from 'src/supa-auth/supa-auth.guard';
-import { Permissions } from 'src/permissions/permissions.decorator';
+import { SupaAuthGuard } from '../supa-auth/supa-auth.guard';
+import { Permissions } from '../permissions/permissions.decorator';
 
 @Controller('user')
 export class UserController {
@@ -10,47 +12,57 @@ export class UserController {
     @Get()
     @UseGuards(SupaAuthGuard)
     @Permissions('superadmin', 'users:r')
-    listAll() {
-        console.log('listing all users')
-        return this.userService.listAll()
+    async listAll() {
+        return await this.userService.listAll()
     }
 
     @Get(':uuid')
     @UseGuards(SupaAuthGuard)
     @Permissions('superadmin')
-    find(@Param(':uuid') uuid: string) {
-        return this.userService.find(uuid)
+    async find(@Param(':uuid') uuid: string) {
+        return await this.userService.find(uuid)
     }
-    
+
     @Put(':uuid')
     @UseGuards(SupaAuthGuard)
-    update(@Param(':uuid') uuid: string, @Body() user: any) {
-        return this.userService.update(uuid, user)
+    async update(@Param(':uuid') uuid: string, @Body() user: User) {
+        const response = await this.userService.update(uuid, user)
+        if (response) return response
+
+        throw new NotFoundException('User not found')
     }
 
     @Get('verify')
-    verifyEmailWithOtp(@Query('token') token: string, @Query('email') email: string) {
-        return this.userService.verifyEmailOtp(email, token)
+    async verifyEmailWithOtp(@Query('token') token: string, @Query('email') email: string) {
+        const response = await this.userService.verifyEmailOtp(email, token)
+        if (response) return response
+
+        throw new NotFoundException('User not found')
     }
 
     @Post()
-    createUser(@Body() signup: any) {
-        return this.userService.create(signup.email, signup.password)
+    async createUser(@Body() signup: SignInWithPasswordCredentials) {
+        if ('email' in signup) {
+            return await this.userService.create(signup.email, signup.password)
+        }
+
+        throw new BadRequestException('Email and password are required')
     }
 
     @Post('login')
-    login(@Body() login: any) {
-        if(login.type === 'oauth') {
-            return this.userService.signInWithOAuth(login.provider)
-        } else if(login.type === 'password') {
-            return this.userService.signInWithPassword(login.email, login.password)
+    async login(@Body() body: { oauth?: SignInWithOAuthCredentials, login?: SignInWithPasswordCredentials }) {
+        if (body.oauth) {
+            return await this.userService.signInWithOAuth(body.oauth)
+        } else if (body.login) {
+            if ('email' in body.login) {
+                return await this.userService.signInWithPassword(body.login.email, body.login.password)
+            }
         }
-        throw new Error('Invalid login type')
+        throw new Error('Invalid login payload')
     }
 
     @Post('refresh')
-    refresh(@Body() refresh: any) {
-        return this.userService.refresh(refresh.token)
+    async refresh(@Body() refresh: { refresh_token: string }) {
+        return await this.userService.refresh(refresh.refresh_token)
     }
-
 }

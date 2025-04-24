@@ -1,7 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { Observable } from 'rxjs';
 import { PERMISSIONS_KEY } from '../permissions/permissions.decorator';
 
 @Injectable()
@@ -11,7 +10,7 @@ export class RoleAuthGuard implements CanActivate {
 
   canActivate(
     context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  ): boolean | Promise<boolean> {
     console.log('Can activate Roles called')
     const requiredPermissions = this.reflector.getAllAndOverride<string[]>(PERMISSIONS_KEY, [
       context.getHandler(),
@@ -73,7 +72,7 @@ export class RoleAuthGuard implements CanActivate {
       }
     }
 
-    console.log('All user permissions:', userPermissions);
+    console.log('User permissions:', userPermissions);
     console.log('Required permissions:', requiredPermissions);
     const hasPermissions = requiredPermissions.every(p => userPermissions.includes(p));
     console.log('Has required permissions:', hasPermissions);
@@ -81,9 +80,7 @@ export class RoleAuthGuard implements CanActivate {
   }
 
   private async authenticate(token: string) {
-    console.log('Authenticating token');
     const { data, error } = await this.supabaseClient.auth.getUser(token);
-    console.log('Authentication result:', error ? `Error: ${error.message}` : 'Success');
     if (error) return false;
     return data;
   }

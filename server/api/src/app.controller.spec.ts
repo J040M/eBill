@@ -14,7 +14,9 @@ describe('AppController', () => {
     appController = app.get<AppController>(AppController);
   });
 
-  describe('root', () => {
-    
+  describe('ping', () => {
+    it('should return "Pong!"', () => {
+      expect(appController.ping()).toBe('Pong!');
+    });
   });
 });

@@ -5,7 +5,7 @@ import { SupabaseClient } from '@supabase/supabase-js';
 export class EbillService {
     constructor(private readonly supabaseClient: SupabaseClient) { }
 
-    async create(ebill: any): Promise<any> {
+    async create(ebill: Ebill): Promise<Ebill[]> {
         const { data, error } = await this.supabaseClient
             .from('ebills')
             .insert(ebill)
@@ -14,7 +14,7 @@ export class EbillService {
         return data
     }
 
-    async findOneById(uuid: string): Promise<any> {
+    async findOneById(uuid: string): Promise<Ebill> {
         const { data, error } = await this.supabaseClient
             .from('ebills')
             .select('*')
@@ -24,7 +24,7 @@ export class EbillService {
         return data
     }
 
-    async findAll(): Promise<any[]> {
+    async findAll(): Promise<Ebill[]> {
         const { data, error } = await this.supabaseClient
             .from('ebills')
             .select('*')
@@ -32,22 +32,42 @@ export class EbillService {
         return data
     }
 
-    async update(uuid: string, ebill: any): Promise<any> {
+    async update(ebill: Ebill): Promise<Ebill[]> {
         const { data, error } = await this.supabaseClient
             .from('ebills')
             .update(ebill)
-            .eq('uuid', uuid)
+            .eq('uuid', ebill.uuid)
             .select()
         if (error) throw new Error(error.message)
         return data
     }
 
-    async archiveEbill(uuid: string): Promise<any> {
+    async archiveEbill(uuid: string): Promise<void> {
         const { error } = await this.supabaseClient
             .from('ebills')
             .update({ archived: true })
             .eq('uuid', uuid)
 
         if (error) throw new Error(error.message)
+    }
+
+    async searchByNumber(number: string): Promise<Ebill[]> {
+        const { data, error } = await this.supabaseClient
+            .from('ebills')
+            .select('*')
+            .ilike('eb_number', `%${number}%`)
+
+        if (error) throw new Error(error.message)
+        return data
+    }
+
+    async searchByDate(date: Date): Promise<Ebill[]> {
+        const { data, error } = await this.supabaseClient
+            .from('ebills')
+            .select('*')
+            .eq('eb_date', date)
+        
+        if (error) throw new Error(error.message)
+        return data
     }
 }

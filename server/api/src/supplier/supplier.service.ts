@@ -5,7 +5,7 @@ import { SupabaseClient } from '@supabase/supabase-js';
 export class SupplierService {
     constructor(private readonly supabaseClient: SupabaseClient) {}
 
-    async create(supplier: any): Promise<any> {
+    async create(supplier: Supplier): Promise<Supplier[]> {
         const { data, error } = await this.supabaseClient
             .from('suppliers')
             .insert(supplier)
@@ -14,7 +14,7 @@ export class SupplierService {
         return data
     }
 
-    async findOneById(uuid: string): Promise<any> {
+    async findOneById(uuid: string): Promise<Supplier> {
         const { data, error } = await this.supabaseClient
             .from('suppliers')
             .select('*')
@@ -24,7 +24,7 @@ export class SupplierService {
         return data
     }
 
-    async findAll(): Promise<any[]> {
+    async findAll(): Promise<Supplier[]> {
         const { data, error } = await this.supabaseClient
             .from('suppliers')
             .select('*')
@@ -32,7 +32,7 @@ export class SupplierService {
         return data
     }
 
-    async update(uuid: string, supplier: any): Promise<any> {
+    async update(uuid: string, supplier: Supplier): Promise<Supplier[]> {
         const { data, error } = await this.supabaseClient
             .from('suppliers')
             .update(supplier)
@@ -42,7 +42,7 @@ export class SupplierService {
         return data
     }
 
-    async archiveSupplier(uuid: string): Promise<any> { 
+    async archiveSupplier(uuid: string): Promise<void> { 
         const { error } = await this.supabaseClient
             .from('suppliers')
             .update({ archived: true })

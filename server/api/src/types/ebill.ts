@@ -1,6 +1,6 @@
 interface Ebill {
-    uuid: string;
-    contents: Record<string, any>;
+    uuid?: string;
+    contents: Record<string, string>;
     eb_number: string;
     eb_date: Date;
     eb_due_date: Date;
