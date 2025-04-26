@@ -1,13 +1,20 @@
-interface Ebill {
+export interface Ebill {
     uuid?: string;
-    contents: Record<string, string>;
-    eb_number: string;
-    eb_date: Date;
-    eb_due_date: Date;
-    eb_supplier: string;
-    eb_items: any[];
-    eb_taxes: number;
-    eb_total: number;
-    created_at: Date;
-    modified_at: Date;
+    items: {
+        label: string;
+        quantity: number;
+        price_unit: number;
+    }[];
+    bill_number: string;
+    issue_date: Date;
+    due_date: Date;
+    supplier?: string;
+    supplier_label: string;
+    tax: {
+        label: string;
+        value: number;
+    }[];
+    total: number;
+    created_at?: Date;
+    modified_at?: Date;
 }
