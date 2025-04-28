@@ -10,6 +10,7 @@ import { EbillService } from './ebill.service';
 import { StorageService } from '../storage/storage.service';
 import { SupaAuthGuard } from '../supa-auth/supa-auth.guard';
 import { Permissions } from '../permissions/permissions.decorator';
+import { Ebill } from 'src/types';
 
 @Controller('ebill')
 @UseGuards(SupaAuthGuard)
@@ -35,6 +36,7 @@ export class EbillController {
     @Permissions('ebill')
     @UseInterceptors(FileInterceptor('file'))
     async uploadFile(@UploadedFile() file: Express.Multer.File) {
+        
         if (!file) {
             throw new BadRequestException('File not found')
         }

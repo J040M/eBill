@@ -1,6 +1,7 @@
 import { Controller, UseGuards, Get, Post, Put } from '@nestjs/common';
 import { SupaAuthGuard } from '../supa-auth/supa-auth.guard';
 import { SupplierService } from './supplier.service';
+import { Supplier } from 'src/types';
 
 @Controller('supplier')
 @UseGuards(SupaAuthGuard)
