@@ -16,7 +16,6 @@ if(!config) {
 async function dispatcherWorker(): Promise<void> {
     const ocrResult = await ocrWorker(config.file)
     const ollamaResult = await ollamaWorker(config.ollamaConfig, ocrResult)
-    
     await supaWorker(config.supaConfig, ollamaResult)
 
     parentPort?.postMessage(`File processed`)

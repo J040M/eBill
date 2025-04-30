@@ -1,9 +1,9 @@
-interface ollamaConfig {
+export interface ollamaConfig {
     url: string;
     model: string;
 }
 
-interface supaConfig {
+export interface supaConfig {
     url: string;
     apiKey: string;
 }

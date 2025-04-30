@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { SupabaseClient } from '@supabase/supabase-js';
+import { Supplier } from 'src/types';
 
 @Injectable()
 export class SupplierService {
@@ -14,7 +15,7 @@ export class SupplierService {
         return data
     }
 
-    async findOneById(uuid: string): Promise<Supplier> {
+    async find(uuid: string): Promise<Supplier> {
         const { data, error } = await this.supabaseClient
             .from('suppliers')
             .select('*')

@@ -1,6 +1,6 @@
 import { createWorker } from "tesseract.js";
 
-async function ocrWorker(filePath: string): Promise<string> {
+export async function ocrWorker(filePath: string): Promise<string> {
     console.log(`OCR file: ${filePath}`);
 
     const ocrWorker = await createWorker('deu')

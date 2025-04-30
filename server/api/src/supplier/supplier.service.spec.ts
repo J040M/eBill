@@ -66,7 +66,7 @@ describe('SupplierService', () => {
 
   it('should find a supplier by ID', async () => {
     const uuid = '1234';
-    const result = await service.findOneById(uuid);
+    const result = await service.find(uuid);
     expect(mockSupabaseClient.from).toHaveBeenCalledWith('suppliers');
     expect(result).toEqual(singleResult.data);
   });

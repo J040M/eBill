@@ -1,4 +1,4 @@
-interface Supplier {
+export interface Supplier {
     uuid: string;
     name: string;
     contact?: {

@@ -1,6 +1,7 @@
 import { Controller, UseGuards, Get, Post, Put } from '@nestjs/common';
 import { SupaAuthGuard } from '../supa-auth/supa-auth.guard';
 import { SupplierService } from './supplier.service';
+import { Supplier } from 'src/types';
 
 @Controller('supplier')
 @UseGuards(SupaAuthGuard)
@@ -8,18 +9,18 @@ export class SupplierController {
     constructor(private readonly supplierService: SupplierService) { }
 
     @Get()
-    listAll() {
+    findAll() {
         console.log('listing all suppliers')
         return this.supplierService.findAll()
     }
 
     @Get(':uuid')
     find(uuid: string) {
-        return this.supplierService.findOneById(uuid)
+        return this.supplierService.find(uuid)
     }
 
     @Post()
-    createSupplier(supplier: Supplier) {
+    create(supplier: Supplier) {
         return this.supplierService.create(supplier)
     }
     

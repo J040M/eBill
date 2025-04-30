@@ -10,6 +10,7 @@ import { EbillService } from './ebill.service';
 import { StorageService } from '../storage/storage.service';
 import { SupaAuthGuard } from '../supa-auth/supa-auth.guard';
 import { Permissions } from '../permissions/permissions.decorator';
+import { Ebill } from 'src/types';
 
 @Controller('ebill')
 @UseGuards(SupaAuthGuard)
@@ -18,13 +19,13 @@ export class EbillController {
 
     @Get()
     @Permissions('ebill')
-    async getAllEbill() {
+    async getAllEbills() {
         return await this.ebillService.findAll()
     }
 
     @Get(':uuid')
     @Permissions('ebill')
-    async getEbill(@Param(':uuid') uuid: string) {
+    async find(@Param(':uuid') uuid: string) {
         const response = await this.ebillService.findOneById(uuid)
 
         if (!response) throw new NotFoundException('No ebills found')
@@ -35,6 +36,7 @@ export class EbillController {
     @Permissions('ebill')
     @UseInterceptors(FileInterceptor('file'))
     async uploadFile(@UploadedFile() file: Express.Multer.File) {
+        
         if (!file) {
             throw new BadRequestException('File not found')
         }

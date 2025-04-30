@@ -51,6 +51,7 @@ export class UserController {
 
     @Post('login')
     async login(@Body() body: { oauth?: SignInWithOAuthCredentials, login?: SignInWithPasswordCredentials }) {
+        console.log('Login body:', body)
         if (body.oauth) {
             return await this.userService.signInWithOAuth(body.oauth)
         } else if (body.login) {

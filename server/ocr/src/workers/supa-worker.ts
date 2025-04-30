@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
-import type { Ebill } from '../schemas/schema_0'
+import type { Ebill, supaConfig } from '../types'
 
-async function supaWorker(config: supaConfig, ebill: Ebill): Promise<void> {
+async function supaWorker(config: supaConfig, ebill: Partial<Ebill>): Promise<void> {
     console.log(`Starting Supabase worker`)
 
     const supabase = createClient(config.url, config.apiKey)
