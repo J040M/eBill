@@ -11,7 +11,6 @@ export default function Settings() {
             if (savedApiUrl) {
                 setApiUrl(savedApiUrl);
             }
-            console.log('Fetched API URL:', savedApiUrl);
         };
 
         fetchSettings();
@@ -36,7 +35,6 @@ export default function Settings() {
     };
 
     const testApiConnection = async (url: string): Promise<void> => {
-        console.log('Testing API connection to:', url);
         if (!url) {
             showAlert('Please enter a valid URL.');
             return;
@@ -48,7 +46,6 @@ export default function Settings() {
         xhr.open('GET', `${url}/ping`, true);
         xhr.onload = () => {
             if (xhr.status === 200) {
-                console.log('API connection successful:', xhr.responseText);
                 showAlert('API connection successful!');
                 storeSettings('apiUrl', url);
             } else {
@@ -61,8 +58,6 @@ export default function Settings() {
             showAlert('Network error occurred.');
         };
         xhr.send();
-
-        console.log('API connection test initiated.');
     };
 
     const showAlert = (message: string): void => {

@@ -2,16 +2,15 @@ import React, { useState } from "react";
 import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
 
 export default function Login() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleLogin = () => {
-    if (!username || !password) {
+    if (!email || !password) {
       Alert.alert("Error", "Please fill in both fields.");
       return;
     }
 
-    console.log("Logging in with:", { username, password });
     Alert.alert("Success", "Login successful!");
   };
 
@@ -20,9 +19,9 @@ export default function Login() {
       <Text style={styles.title}>Login</Text>
       <TextInput
         style={styles.input}
-        placeholder="Username"
-        value={username}
-        onChangeText={setUsername}
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
       />
       <TextInput
         style={styles.input}
