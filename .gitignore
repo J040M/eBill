@@ -18,6 +18,7 @@ yarn-error.log*
 # Ignore build output
 dist/
 build/
+uploads/
 
 # Ignore system files
 .DS_Store
