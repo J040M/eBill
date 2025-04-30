@@ -10,7 +10,6 @@ export class SupplierController {
 
     @Get()
     findAll() {
-        console.log('listing all suppliers')
         return this.supplierService.findAll()
     }
 

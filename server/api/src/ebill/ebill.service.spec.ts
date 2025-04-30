@@ -95,7 +95,6 @@ describe('EbillService', () => {
 
   it('should update an ebill', async () => {
     const result = await service.update(ebillResultEx.data[0]);
-    console.log(result)
     expect(result).toEqual(ebillResultEx.data);
   });
 

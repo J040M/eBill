@@ -11,20 +11,16 @@ export class RoleAuthGuard implements CanActivate {
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> {
-    console.log('Can activate Roles called')
     const requiredPermissions = this.reflector.getAllAndOverride<string[]>(PERMISSIONS_KEY, [
       context.getHandler(),
       context.getClass(),
     ]);
-
-    console.log('Required roles:', requiredPermissions)
 
     if (!requiredPermissions || requiredPermissions.length === 0) {
       return true;
     }
 
     const token = this.extractTokenFromRequest(context.switchToHttp().getRequest());
-    console.log('Extracted token:', token ? 'Token found' : 'No token');
     if (!token) return false;
 
     return this.validateRolesPermissions(token, requiredPermissions);
@@ -32,14 +28,11 @@ export class RoleAuthGuard implements CanActivate {
   }
 
   protected async validateRolesPermissions(token: string, requiredPermissions: string[]): Promise<boolean> {
-    console.log('Validating roles and permissions for token');
     const authResult = await this.authenticate(token);
-    console.log('Auth result:', authResult ? `User ID: ${authResult.user.id}` : 'Authentication failed');
     if (!authResult) return false;
 
     const userId = authResult.user.id;
 
-    console.log('Querying database for user roles with userId:', userId);
     const { data, error } = await this.supabaseClient
       .from('users_roles')
       .select(`
