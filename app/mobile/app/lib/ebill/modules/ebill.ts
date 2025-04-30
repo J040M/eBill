@@ -1,3 +1,6 @@
+import { Alert } from "react-native";
+import { Options, Ebill } from "../types";
+
 export class EbillApi {
     protected url: string | null = null
 
@@ -5,34 +8,34 @@ export class EbillApi {
         this.url = `${this.options.apiUrl}/ebill`;
     }
 
-    async find(uuid: string) {
-        const xhr = new XMLHttpRequest();
-        xhr.open("GET", `${this.options.apiUrl}/${uuid}`);
-        xhr.setRequestHeader("Authorization", `Bearer ${this.options.accessToken}`);
-        xhr.onload = () => {
-            if (xhr.status === 200) {
-                JSON.parse(xhr.responseText);
-            } else {
-                throw new Error("Failed to fetch eBills.");
-            }
-        };
-        xhr.onerror = () => { throw new Error("Network error.") };
-        xhr.send();
+    async find(uuid: string): Promise<Ebill> {
+        const response = await fetch(`${this.options.apiUrl}/${uuid}`, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${this.options.accessToken}`,
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch eBills.");
+        }
+
+        return await response.json();
     }
 
-    async findAll() {
-        const xhr = new XMLHttpRequest();
-        xhr.open("GET", `${this.options.apiUrl}/ebills`);
-        xhr.setRequestHeader("Authorization", `Bearer ${this.options.accessToken}`);
-        xhr.onload = () => {
-            if (xhr.status === 200) {
-                JSON.parse(xhr.responseText);
-            } else {
-                throw new Error("Failed to fetch eBills.");
-            }
-        };
-        xhr.onerror = () => { throw new Error("Network error.") };
-        xhr.send();
+    async findAll(): Promise<Ebill[]> {
+        const response = await fetch(`${this.options.apiUrl}`, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${this.options.accessToken}`,
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch eBills.");
+        }
+
+        return await response.json();
     }
 
     public async uploadPicture(uri: string): Promise<void> {
@@ -49,43 +52,47 @@ export class EbillApi {
         };
 
         const formData = new FormData();
-        formData.append('file', file as any);
+        formData.append('file', file as any); // `as any` needed for React Native's FormData
 
-        const xhr = new XMLHttpRequest();
+        try {
+            const response = await fetch(`${this.options.apiUrl}/ebill/upload`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${this.options.accessToken}`,
+                },
+                body: formData,
+            });
 
-        xhr.open('POST', `${this.options.apiUrl}/ebill/upload`);
-
-        xhr.setRequestHeader('Accept', 'application/json');
-        xhr.setRequestHeader('Authorization', `Bearer ${this.options.accessToken}`);
-
-        xhr.onload = () => {
-            if (xhr.status === 201) {
-                console.log('Picture uploaded successfully!');
+            if (response.status === 201) {
+                Alert.alert('Upload', 'Bill uploaded successfully');
             } else {
-                console.error('Error uploading picture: Server responded with status', xhr.status, xhr.responseText);
+                const errorText = await response.text();
+                console.error('Error uploading picture: Server responded with status', response.status, errorText);
             }
-        };
-
-        xhr.onerror = (e) => {
-            console.error('Error uploading picture: Network error', e);
-        };
-
-        xhr.send(formData);
+        } catch (error) {
+            console.error('Error uploading picture: Network error', error);
+        }
     }
 
-    async update(uuid: string, data: any) {
-        const xhr = new XMLHttpRequest();
-        xhr.open("PUT", `${this.options.apiUrl}/${uuid}`);
-        xhr.setRequestHeader("Authorization", `Bearer ${this.options.accessToken}`);
-        xhr.setRequestHeader("Content-Type", "application/json");
-        xhr.onload = () => {
-            if (xhr.status === 200) {
-                JSON.parse(xhr.responseText);
-            } else {
-                throw new Error("Failed to update eBill.");
-            }
-        };
-        xhr.onerror = () => { throw new Error("Network error.") };
-        xhr.send(JSON.stringify(data));
-    }
+    async update(uuid: string, data: Ebill): Promise<Ebill> {
+        try {
+          const response = await fetch(`${this.options.apiUrl}/${uuid}`, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${this.options.accessToken}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+          });
+      
+          if (!response.ok) {
+            throw new Error('Failed to update eBill.');
+          }
+      
+          return await response.json();
+        } catch (error) {
+          throw new Error(`Network error: ${error}`);
+        }
+      }      
 }
