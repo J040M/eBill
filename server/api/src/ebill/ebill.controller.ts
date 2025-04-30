@@ -19,13 +19,13 @@ export class EbillController {
 
     @Get()
     @Permissions('ebill')
-    async getAllEbill() {
+    async getAllEbills() {
         return await this.ebillService.findAll()
     }
 
     @Get(':uuid')
     @Permissions('ebill')
-    async getEbill(@Param(':uuid') uuid: string) {
+    async find(@Param(':uuid') uuid: string) {
         const response = await this.ebillService.findOneById(uuid)
 
         if (!response) throw new NotFoundException('No ebills found')
