@@ -19,13 +19,13 @@ export class UserController {
     @Get(':uuid')
     @UseGuards(SupaAuthGuard)
     @Permissions('superadmin')
-    async find(@Param(':uuid') uuid: string) {
+    async find(@Param('uuid') uuid: string) {
         return await this.userService.find(uuid)
     }
 
     @Put(':uuid')
     @UseGuards(SupaAuthGuard)
-    async update(@Param(':uuid') uuid: string, @Body() user: User) {
+    async update(@Param('uuid') uuid: string, @Body() user: User) {
         const response = await this.userService.update(uuid, user)
         if (response) return response
 
@@ -64,5 +64,10 @@ export class UserController {
     @Post('refresh')
     async refresh(@Body() refresh: { refresh_token: string }) {
         return await this.userService.refresh(refresh.refresh_token)
+    }
+
+    @Post('logout')
+    async logout(@Body() accessToken: string ) {
+        return await this.userService.signOut(accessToken)
     }
 }

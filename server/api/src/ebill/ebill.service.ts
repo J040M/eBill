@@ -67,7 +67,7 @@ export class EbillService {
             .from('ebills')
             .select('*')
             .eq('eb_date', date)
-        
+
         if (error) throw new Error(error.message)
         return data
     }

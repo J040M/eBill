@@ -46,29 +46,23 @@ export class RoleAuthGuard implements CanActivate {
       `)
       .eq('fk_user', userId);
 
-    console.log('Query result:', error ? `Error: ${error.message}` : `Retrieved ${data?.length || 0} user roles`);
     if (error || !data) return false;
 
     const userPermissions: string[] = [];
 
     for (const userRole of data) {
       const role = userRole.fk_role;
-      console.log('Processing role:', role ? 'Role found' : 'Role not found');
       if (!role) continue;
 
       for (const rolePermission of (role as any).roles_permissions || []) {
         const permissionName = rolePermission.fk_permission?.permissions;
-        console.log('Found permission:', permissionName || 'Permission not found');
         if (permissionName) {
           userPermissions.push(permissionName);
         }
       }
     }
 
-    console.log('User permissions:', userPermissions);
-    console.log('Required permissions:', requiredPermissions);
     const hasPermissions = requiredPermissions.every(p => userPermissions.includes(p));
-    console.log('Has required permissions:', hasPermissions);
     return hasPermissions;
   }
 

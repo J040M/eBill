@@ -55,7 +55,7 @@ describe('EbillController tests', () => {
     const result = [{ id: 1, name: 'Ebill1' }];
     jest.spyOn(mockEbillService, 'findAll').mockResolvedValue(result);
 
-    expect(await controller.getAllEbills()).toBe(result);
+    expect(await controller.findAll()).toBe(result);
   });
 
   it('should return a single ebill by uuid', async () => {

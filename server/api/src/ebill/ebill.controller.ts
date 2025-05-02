@@ -19,13 +19,13 @@ export class EbillController {
 
     @Get()
     @Permissions('ebill')
-    async getAllEbills() {
+    async findAll() {
         return await this.ebillService.findAll()
     }
 
     @Get(':uuid')
     @Permissions('ebill')
-    async find(@Param(':uuid') uuid: string) {
+    async find(@Param('uuid') uuid: string) {
         const response = await this.ebillService.findOneById(uuid)
 
         if (!response) throw new NotFoundException('No ebills found')
@@ -36,7 +36,6 @@ export class EbillController {
     @Permissions('ebill')
     @UseInterceptors(FileInterceptor('file'))
     async uploadFile(@UploadedFile() file: Express.Multer.File) {
-        
         if (!file) {
             throw new BadRequestException('File not found')
         }
