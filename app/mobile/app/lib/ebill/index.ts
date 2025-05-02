@@ -1,14 +1,11 @@
 import { AuthApi, EbillApi, SupplierApi } from './modules';
+import { Options } from './types';
 
 export default class EbillClient {
     protected options: Options;
     
-    constructor(url: string) {
-        if (!url) throw new Error("API URL is not set.");
-        
-        this.options = {
-            apiUrl: url
-        }
+    constructor(options: Options) {
+        this.options = options
     }
 
     get auth() {

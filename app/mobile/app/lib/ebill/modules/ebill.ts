@@ -9,13 +9,14 @@ export class EbillApi {
     }
 
     async find(uuid: string): Promise<Ebill> {
-        const response = await fetch(`${this.options.apiUrl}/${uuid}`, {
+        const response = await fetch(`${this.url}/${uuid}`, {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${this.options.accessToken}`,
             },
         });
 
+        console.log('Response', response)
         if (!response.ok) {
             throw new Error("Failed to fetch eBills.");
         }
@@ -24,7 +25,7 @@ export class EbillApi {
     }
 
     async findAll(): Promise<Ebill[]> {
-        const response = await fetch(`${this.options.apiUrl}`, {
+        const response = await fetch(`${this.url}`, {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${this.options.accessToken}`,

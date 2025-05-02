@@ -13,8 +13,15 @@ export const ClientProvider = ({ children }: { children: React.ReactNode }) => {
     const initClient = async () => {
       try {
         const apiUrl = await AsyncStorage.getItem('apiUrl');
+        const accessToken = await AsyncStorage.getItem('accessToken')
+        const refreshToken = await AsyncStorage.getItem('refreshToken')
+        
         if (apiUrl) {
-          const client = new EbillClient(apiUrl);
+          const client = new EbillClient({
+            apiUrl,
+            ...(accessToken && { accessToken }),
+            ...(refreshToken && { refreshToken }),
+          });
           setClient(client);
         } else {
           console.error('apiUrl not found in AsyncStorage');

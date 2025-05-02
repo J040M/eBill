@@ -1,84 +1,113 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Options, User } from "../types";
+
 export class AuthApi {
     protected url: string | null = null
-    public user: any = null;
+    public user: User | null = null;
 
     constructor(protected options: Options) {
         this.url = `${this.options.apiUrl}/user`;
     }
 
-    public async login(username: string, password: string): Promise<void> {
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", `${this.url}/login`);
-        xhr.setRequestHeader("Content-Type", "application/json");
-
+    public async login(email: string, password: string): Promise<void> {
         const payload = {
             login: {
                 type: "password",
-                username,
+                email,
                 password,
+            },
+        };
+
+        try {
+            const response = await fetch(`${this.url}/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            });
+
+            if (response.status !== 201) {
+                throw new Error('Login failed.');
             }
+
+            const data = await response.json();
+
+            this.options.accessToken = data.session.access_token;
+            this.options.refreshToken = data.session.refresh_token;
+
+            await AsyncStorage.multiSet([
+                ['accessToken', data.session.access_token],
+                ['refreshToken', data.session.refresh_token],
+            ]);
+
+            this.user = {
+                id: data.user.id,
+                email: data.user.email,
+            };
+
+        } catch (err) {
+            throw new Error(`Error contacting server`);
         }
-
-        xhr.onload = () => {
-            if (xhr.status === 200) {
-                const data = JSON.parse(xhr.responseText);
-
-                this.options.accessToken = data.session.access_token;
-                this.options.refreshToken = data.session.refresh_token;
-
-                this.user.id = data.user.id;
-                this.user.email = data.user.email;
-            } else {
-                throw new Error("Login failed.");
-            }
-        };
-        xhr.onerror = () => {
-            throw new Error("Error contacting server");
-        };
-
-        xhr.send(JSON.stringify(payload));
     }
+
 
     public async logout(): Promise<void> {
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", `${this.options.apiUrl}/logout`);
-        xhr.setRequestHeader("Authorization", `Bearer ${this.options.accessToken}`);
-        xhr.onload = () => {
-            if (xhr.status === 200) {
-                delete this.options.accessToken;
-                delete this.options.refreshToken;
-                this.user = null;
-            } else {
-                throw new Error("Logout failed.");
-            }
-        };
-        xhr.onerror = () => { throw new Error("Error contacting server") };
-        xhr.send();
+        try {
+            const response = await fetch(`${this.url}/logout`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.options.accessToken}`,
+                },
+            });
 
+            if (!response.ok) {
+                throw new Error('Logout failed.');
+            }
+
+            delete this.options.accessToken;
+            delete this.options.refreshToken;
+
+            await AsyncStorage.multiRemove(['accessToken', 'refreshToken']);
+
+            this.user = null;
+
+        } catch (err) {
+            throw new Error(`Error contacting server`);
+        }
     }
 
-    public async renewAccessToken(): Promise<void> {
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", `${this.options.apiUrl}/refresh`);
-        xhr.setRequestHeader("Content-Type", "application/json");
 
+    public async renewAccessToken(): Promise<void> {
         const payload = {
             refresh_token: this.options.refreshToken,
-        }
+        };
 
-        xhr.onload = () => {
-            if (xhr.status === 200) {
-                const data = JSON.parse(xhr.responseText);
-                this.options.accessToken = data.session.access_token;
-                this.options.refreshToken = data.session.refresh_token;
-            } else {
-                throw new Error("Refresh token failed.");
+        try {
+            const response = await fetch(`${this.url}/refresh`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            });
+
+            if (!response.ok) {
+                throw new Error('Refresh token failed.');
             }
-        };
-        xhr.onerror = () => {
-            throw new Error("Error contacting server");
-        };
 
-        xhr.send(JSON.stringify(payload));
+            const data = await response.json();
+
+            this.options.accessToken = data.access_token;
+            this.options.refreshToken = data.refresh_token;
+
+            await AsyncStorage.multiSet([
+                ['accessToken', data.access_token],
+                ['refreshToken', data.refresh_token],
+            ]);
+
+        } catch (err) {
+            throw new Error(`Error contacting server`);
+        }
     }
 }

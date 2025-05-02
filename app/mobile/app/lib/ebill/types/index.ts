@@ -48,3 +48,8 @@ export interface Supplier {
     created_at: Date;
     modified_at: Date;
 }
+
+export interface User {
+    id: string,
+    email: string,
+}
