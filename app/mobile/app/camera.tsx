@@ -4,20 +4,22 @@ import { useRef, useState } from 'react';
 import { router } from 'expo-router';
 import { Image } from 'expo-image';
 import { useClient } from './lib/clientContext';
+import { useTranslation } from 'react-i18next';
 
 export default function App() {
+  const { t } = useTranslation();
   const [permission, requestPermission] = useCameraPermissions();
-  const [uri, setUri] = useState<string | null>(null);
+  const [uri, setUri] = useState<string>("");
   const cameraRef = useRef<CameraView>(null);
   const client = useClient();
-    
+
   if (!permission) {
     return <View />;
   } else if (!permission.granted) {
     return (
       <View style={styles.container}>
-        <Text style={styles.message}>We need your permission to show the camera</Text>
-        <Button onPress={requestPermission} title="Grant permission" />
+        <Text style={styles.message}>{t('camera.actions.request_permission')}</Text>
+        <Button onPress={requestPermission} title={t('camera.actions.request_permission')} />
       </View>
     );
   }
@@ -25,16 +27,16 @@ export default function App() {
   const renderCamera = () => {
     return (
       <CameraView style={styles.camera} facing="back" ref={cameraRef}>
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.button} onPress={takePicture}>
-              <Text style={styles.text}>Take Picture</Text>
-            </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.button} onPress={takePicture}>
+            <Text style={styles.text}>{t('camera.actions.take_picture')}</Text>
+          </TouchableOpacity>
 
-            <TouchableOpacity style={styles.button} onPress={router.back}>
-              <Text style={styles.text}>Close Camera</Text>
-            </TouchableOpacity>
-          </View>
-        </CameraView>
+          <TouchableOpacity style={styles.button} onPress={router.back}>
+            <Text style={styles.text}>{t('camera.actions.close_camera')}</Text>
+          </TouchableOpacity>
+        </View>
+      </CameraView>
     )
   }
 
@@ -46,14 +48,14 @@ export default function App() {
           contentFit="contain"
           style={{ width: 400, aspectRatio: 1 }}
         />
-        <Button onPress={() => setUri(null)} title="Take another picture" />
-        <Button onPress={() => client.ebill.uploadPicture(uri!)} title="Upload bill" />
+        <Button onPress={() => setUri("")} title={t('camera.actions.retake_picture')} />
+        <Button onPress={() => client.ebill.uploadPicture(uri!)} title={t('camera.actions.upload_picture')} />
       </View>
     );
   };
 
   const takePicture = async () => {
-    if(!cameraRef.current) {
+    if (!cameraRef.current) {
       console.error('Camera ref is not set');
       return;
     };
@@ -64,14 +66,14 @@ export default function App() {
       skipProcessing: true,
       imageType: 'jpg',
     });
-    
-    if(picture) setUri(picture.uri);
+
+    if (picture) setUri(picture.uri);
     else console.error('Error taking picture: No picture returned');
   }
 
   return (
     <View style={styles.container}>
-      { uri ? renderPicture() : renderCamera()}
+      {uri ? renderPicture() : renderCamera()}
     </View>
   );
 }

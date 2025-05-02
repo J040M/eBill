@@ -1,8 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { View, TextInput, Button, Alert, StyleSheet } from 'react-native';
 
 export default function Settings() {
+    const { t } = useTranslation()
     const [apiUrl, setApiUrl] = useState<string>('');
 
     useEffect(() => {
@@ -36,7 +38,7 @@ export default function Settings() {
 
     const testApiConnection = async (url: string): Promise<void> => {
         if (!url) {
-            showAlert('Please enter a valid URL.');
+            showAlert(t('alerts.api.missing_url'));
             return;
         }
 
@@ -46,16 +48,16 @@ export default function Settings() {
         xhr.open('GET', `${url}/ping`, true);
         xhr.onload = () => {
             if (xhr.status === 200) {
-                showAlert('API connection successful!');
+                showAlert(t('alerts.api.success'));
                 storeSettings('apiUrl', url);
             } else {
                 console.error('API connection failed:', xhr.statusText);
-                showAlert('API connection failed. Please check the URL.');
+                showAlert(t('alerts.api.fail'));
             }
         };
         xhr.onerror = () => {
             console.error('Network error while testing API connection');
-            showAlert('Network error occurred.');
+            showAlert(t('alerts.network.fail'));
         };
         xhr.send();
     };
@@ -67,13 +69,13 @@ export default function Settings() {
     return (
         <View style={styles.centeredContainer}>
             <TextInput
-                placeholder="API URL"
+                placeholder={t('settings.inputs.placeholder.api_url')}
                 value={apiUrl}
                 onChangeText={(text) => setApiUrl(text)}
                 style={styles.input}
             />
             <Button
-                title="Save"
+                title={t('settings.actions.save_api_url')}
                 onPress={() => testApiConnection(apiUrl)}
             />
         </View>

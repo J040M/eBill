@@ -1,31 +1,39 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
+import { useClient } from "./lib/clientContext";
 
 export default function Login() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const client = useClient()
 
   const handleLogin = () => {
     if (!email || !password) {
-      Alert.alert("Error", "Please fill in both fields.");
+      Alert.alert(t('alerts.error'), t('alerts.login.missing_inputs'));
       return;
     }
 
-    Alert.alert("Success", "Login successful!");
+    try {
+      client.auth.login(email, password)
+    } catch (e) {
+      Alert.alert(t('alerts.api.fail_title'), t('alerts.api.fail'));
+    }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
+      <Text style={styles.title}>{t('login.title')}</Text>
       <TextInput
         style={styles.input}
-        placeholder="Email"
+        placeholder={t('login.email')}
         value={email}
         onChangeText={setEmail}
       />
       <TextInput
         style={styles.input}
-        placeholder="Password"
+        placeholder={t('login.password')}
         value={password}
         onChangeText={setPassword}
         secureTextEntry

@@ -1,59 +1,65 @@
 import { useLocalSearchParams } from 'expo-router';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { useClient } from './lib/clientContext';
-import { Ebill } from './lib/ebill/types';
+import { useClient } from '../lib/clientContext';
+import { Ebill } from '../lib/ebill/types';
+import { useTranslation } from 'react-i18next';
 
 export default function ItemDetail() {
+  const { t } = useTranslation();
   const { uuid } = useLocalSearchParams();
   const [item, setItem] = useState<Ebill | null>(null);
   const client = useClient();
 
   useEffect(() => {
+    console.log('getting one item')
+    console.log('UUID', uuid)
     if (typeof uuid === 'string') {
-      client.ebill.find(uuid).then(setItem);
+      client.ebill.find(uuid).then((ebill)=> {
+        setItem(ebill)
+      });
     }
   }, [uuid]);
 
   if (!item) {
     return (
       <View style={styles.centered}>
-        <Text>Loading item...</Text>
+        <Text>{t('ebill.loading')}</Text>
       </View>
     );
   }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}>Bill #{item.bill_number}</Text>
-      <Text style={styles.label}>UUID:</Text>
+      <Text style={styles.header}>{t('ebill.form.bill_number')}{item.bill_number}</Text>
+      <Text style={styles.label}>{t('ebill.form.id')}</Text>
       <Text style={styles.value}>{item.uuid}</Text>
 
-      <Text style={styles.label}>Supplier:</Text>
+      <Text style={styles.label}>{t('ebill.form.supplier')}</Text>
       <Text style={styles.value}>{item.supplier_label}</Text>
 
-      <Text style={styles.label}>Issue Date:</Text>
+      <Text style={styles.label}>{t('ebill.form.issue_date')}</Text>
       <Text style={styles.value}>{new Date(item.issue_date).toLocaleDateString()}</Text>
 
-      <Text style={styles.label}>Due Date:</Text>
+      <Text style={styles.label}>{t('ebill.form.due_date')}</Text>
       <Text style={styles.value}>{new Date(item.due_date).toLocaleDateString()}</Text>
 
-      <Text style={styles.section}>Items</Text>
+      <Text style={styles.section}>{t('ebill.form.items.title')}</Text>
       {item.items.map((itm, index) => (
         <View key={index} style={styles.box}>
-          <Text style={styles.value}>• {itm.label}</Text>
-          <Text style={styles.subValue}>Qty: {itm.quantity} | Unit: {itm.price_unit}</Text>
+          <Text style={styles.value}>{t('ebill.form.items.label')} {itm.label}</Text>
+          <Text style={styles.subValue}>{t('ebill.form.items.quantity')} {itm.quantity} | {t('ebill.form.items.amount')} {itm.price_unit}</Text>
         </View>
       ))}
 
-      <Text style={styles.section}>Taxes</Text>
+      <Text style={styles.section}>{t('ebill.form.tax.title')}</Text>
       {item.tax.map((t, index) => (
         <View key={index} style={styles.box}>
           <Text style={styles.value}>• {t.label}: {t.value}%</Text>
         </View>
       ))}
 
-      <Text style={styles.label}>Total:</Text>
+      <Text style={styles.label}>{t('ebill.form.total')}</Text>
       <Text style={styles.total}>{item.total.toFixed(2)} €</Text>
     </ScrollView>
   );

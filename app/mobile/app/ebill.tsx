@@ -11,8 +11,10 @@ import {
 import { useRouter } from 'expo-router';
 import { Ebill } from './lib/ebill/types';
 import { useClient } from './lib/clientContext';
+import { useTranslation } from 'react-i18next';
 
 export default function ItemsScreen() {
+  const { t } = useTranslation();
   const [items, setItems] = useState<Ebill[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -41,7 +43,7 @@ export default function ItemsScreen() {
     return (
       <View style={styles.centered}>
         <ActivityIndicator size="large" />
-        <Text>Loading...</Text>
+        <Text>{t('ebill.loading')}</Text>
       </View>
     );
   }
@@ -55,13 +57,14 @@ export default function ItemsScreen() {
           style={styles.item}
           onPress={() => router.push(`/ebill/${item.uuid}`)}
         >
-          <Text style={styles.billNumber}>Bill #{item.bill_number}</Text>
-          <Text style={styles.label}>Supplier:</Text>
+          <Text style={styles.billNumber}>{t('ebill.form.bill_number')}{item.bill_number}</Text>
+          <Text style={styles.label}>{t('ebill.form.supplier')}</Text>
           <Text style={styles.value}>{item.supplier_label}</Text>
 
           <View style={styles.row}>
-            <Text style={styles.meta}>Due: {new Date(item.due_date).toLocaleDateString()}</Text>
-            <Text style={styles.meta}>Total: {item.total.toFixed(2)} €</Text>
+            <Text style={styles.meta}>{t('ebill.form.issue_date')} {new Date(item.issue_date).toLocaleDateString()}</Text>
+            <Text style={styles.meta}>{t('ebill.form.due_date')} {new Date(item.due_date).toLocaleDateString()}</Text>
+            <Text style={styles.meta}>{t('ebill.form.total')} {item.total.toFixed(2)} €</Text>
           </View>
         </TouchableOpacity>
       )}
